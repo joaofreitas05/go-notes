@@ -1,0 +1,27 @@
+name: CI/CD Deployment
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy via Cloudflare Tunnel
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22 
+          script: |
+            echo "Iniciando Deployment Automático..."
+            cd /home/appuser/go-notes
+            git pull origin main
+            go build -o go-notes
+            sudo systemctl restart go-notes
+            echo "Deployment concluído com sucesso!"
